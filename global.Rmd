@@ -1,0 +1,73 @@
+---
+title: "Untitled"
+author: "Gregory Utkin"
+date: "6/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+
+glb_mntr <- read_excel("C:\\Users\\grish\\Desktop\\hybrid_stats_course\\data\\wgm2018_dataset_crosstabs_all_countries.xlsx", sheet = 1) %>%
+  janitor::clean_names()
+
+glb_mntr2 <- read_excel("C:\\Users\\grish\\Desktop\\hybrid_stats_course\\data\\wgm2018_dataset_crosstabs_all_countries.xlsx", sheet = 2) %>%
+  janitor::clean_names()
+
+
+```
+
+
+
+
+```{r}
+DF <- glb_mntr %>%
+  filter(
+    x2 == "Q25 Do you strongly or somewhat agree, strongly or somewhat disagree or neither agree nor disagree with the following statement? Vaccines are safe.",
+    x3 == "Strongly agree" | x3 == "Somewhat agree"
+  ) %>%
+  select(x1, x3, national_results) %>%
+  transmute(
+    country = factor(x1),
+    agree = factor(x3),
+    result = as.numeric(national_results)
+  ) %>%
+  pivot_wider(names_from = agree, values_from = result) %>%
+  janitor::clean_names() %>%
+  mutate(
+    agree = strongly_agree + somewhat_agree
+  ) %>%
+  select(-c(strongly_agree, somewhat_agree)) %>%
+  mutate(
+    region = case_when(
+      country == c("Australia", "Bangladesh", "India", "Indonesia", "Japan", "Malaysia", "Myanmar", "Mongolia", "Nepal", 
+                   "New Zealand", "Pakistan", "Singapore", "South Korea", "Taiwan", "Thailand", "Vietnam") ~ "Asia",
+      country == c("Algeria", "Yemen", "United Arab Emirates", "Palestine", "Moroco", "Libya", "Lebanon", "Kuwait",
+                   "Jordan", "Israel", "Iraq", "Iran", "Egypt", "Saudi Arabia") ~ "Middle East North Africa",
+      country == c("Togo", "Gabon", "Mauritius", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", 
+                   "Chad", "Comoros", "Congo, Rep.", "Ethiopia", "Gabon", "Guinea", "Ghana", "Kenya", "Mauritania",
+                   "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Senegal", "Mali", "Malawi", "Sierra Leone", "South Africa",
+                   "Tanzania", "The Gambia", "Togo", "Uganda", "Zambia", "Zimbabwe") ~ "Sub-Saharan Africa",
+      country == c("United States", "Canada", "Brazil", "Mexico", "Venezuela", "Nicaragua", "Guatemala", 
+                   "Columbia", "Argentina", "Bolivia", "Chile", "Costa Rica", "Dominican Republic", "Ecuador", 
+                   "El Salvador", "Honduras", "Peru", "Paraguay", "Panama", "Uruguay", "Haiti") ~ "Americas",
+      country == c("France", "Montenegro", "Germany", "Italy", "Spain", "Austria", "Portugal", "United Kingdom", 
+                   "Switzerland", "Sweden", "Slovenia", "Slovakia", "Serbia", "Romania", "Poland", "Norway", "Northern Cyprus", 
+                   "Netherlands", "Malta", "Macedonia", "Luxembourg", "Kosovo", "Ireland", "Iceland", "Hungary", "Greece", 
+                   "Finland", "Denmark", "Czech Republic", "Cyprus", "Croatia", "Bulgaria", "Belgium", "Albania") ~ "Europe",
+      country == c("Tajikistan", "Turkmenistan", "Azerbaijan", "Moldova",
+                   "Uzbekistan", "Kyrgyzstan", "Armenia", "Kazakhstan",
+                   "Belarus", "Ukraine", "Russia", "Estonia" ,"Lithuania", "Latvia") ~ "Former Soviet Union",
+      TRUE ~ NA_character_
+    )
+  )
+
+
+```
+
+
