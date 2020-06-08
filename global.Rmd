@@ -40,34 +40,43 @@ DF <- glb_mntr %>%
   pivot_wider(names_from = agree, values_from = result) %>%
   janitor::clean_names() %>%
   mutate(
-    agree = strongly_agree + somewhat_agree
+    agree = strongly_agree + somewhat_agree,
+    ranked = percent_rank(agree)
   ) %>%
   select(-c(strongly_agree, somewhat_agree)) %>%
   mutate(
     region = case_when(
-      country == c("Australia", "Bangladesh", "India", "Indonesia", "Japan", "Malaysia", "Myanmar", "Mongolia", "Nepal", 
-                   "New Zealand", "Pakistan", "Singapore", "South Korea", "Taiwan", "Thailand", "Vietnam") ~ "Asia",
-      country == c("Algeria", "Yemen", "United Arab Emirates", "Palestine", "Moroco", "Libya", "Lebanon", "Kuwait",
-                   "Jordan", "Israel", "Iraq", "Iran", "Egypt", "Saudi Arabia") ~ "Middle East North Africa",
-      country == c("Togo", "Gabon", "Mauritius", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", 
-                   "Chad", "Comoros", "Congo, Rep.", "Ethiopia", "Gabon", "Guinea", "Ghana", "Kenya", "Mauritania",
-                   "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Senegal", "Mali", "Malawi", "Sierra Leone", "South Africa",
-                   "Tanzania", "The Gambia", "Togo", "Uganda", "Zambia", "Zimbabwe") ~ "Sub-Saharan Africa",
-      country == c("United States", "Canada", "Brazil", "Mexico", "Venezuela", "Nicaragua", "Guatemala", 
-                   "Columbia", "Argentina", "Bolivia", "Chile", "Costa Rica", "Dominican Republic", "Ecuador", 
+      country %in% c("Australia", "Afghanistan", "Philippines", "China", "Cambodia", "Bangladesh", "India", "Indonesia", "Japan", "Malaysia", "Myanmar", "Mongolia", "Nepal", "Sri Lanka", "New Zealand", "Pakistan", "Singapore", "South Korea", "Taiwan", "Thailand", "Vietnam") ~ "Asia",
+      country %in% c("Algeria","Morocco", "Yemen", "Tunisia", "United Arab Emirates", "Palestine", "Moroco", "Libya", "Lebanon", "Kuwait",
+                   "Jordan", "Israel", "Iraq", "Iran", "Egypt", "Turkey", "Saudi Arabia") ~ "Middle East North Africa",
+      country %in% c("Togo", "Gabon", "Mauritius", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", 
+                   "Chad", "Eswatini", "Comoros", "Congo, Rep.", "Ethiopia", "Gabon", "Guinea", "Ghana", "Kenya", "Mauritania",
+                   "Mozambique", "Namibia", "Ivory Coast", "Niger", "Nigeria", "Liberia", "Rwanda", "Senegal", "Mali", "Malawi", "Sierra Leone", "South Africa", "Tanzania", "The Gambia", "Togo", "Madagascar", "Laos", "Nigeria", "Uganda", "Zambia", "Zimbabwe") ~ "Sub-Saharan Africa",
+      country %in% c("United States", "Canada", "Brazil", "Mexico", "Venezuela", "Nicaragua", "Guatemala", 
+                   "Columbia", "Argentina", "Colombia", "Bolivia", "Chile", "Costa Rica", "Dominican Republic", "Ecuador", 
                    "El Salvador", "Honduras", "Peru", "Paraguay", "Panama", "Uruguay", "Haiti") ~ "Americas",
-      country == c("France", "Montenegro", "Germany", "Italy", "Spain", "Austria", "Portugal", "United Kingdom", 
+      country %in% c("France", "Montenegro", "Germany", "Italy", "Spain", "Austria", "Portugal", "United Kingdom", 
                    "Switzerland", "Sweden", "Slovenia", "Slovakia", "Serbia", "Romania", "Poland", "Norway", "Northern Cyprus", 
-                   "Netherlands", "Malta", "Macedonia", "Luxembourg", "Kosovo", "Ireland", "Iceland", "Hungary", "Greece", 
-                   "Finland", "Denmark", "Czech Republic", "Cyprus", "Croatia", "Bulgaria", "Belgium", "Albania") ~ "Europe",
-      country == c("Tajikistan", "Turkmenistan", "Azerbaijan", "Moldova",
+                   "Netherlands", "Malta", "Macedonia", "Luxembourg", "Bosnia and Herzegovina", "Kosovo", "Ireland", "Iceland", "Hungary", "Greece", "Finland", "Denmark", "Czech Republic", "Cyprus", "Croatia", "Bulgaria", "Belgium", "Albania") ~ "Europe",
+      country %in% c("Tajikistan", "Turkmenistan", "Azerbaijan","Georgia", "Moldova",
                    "Uzbekistan", "Kyrgyzstan", "Armenia", "Kazakhstan",
                    "Belarus", "Ukraine", "Russia", "Estonia" ,"Lithuania", "Latvia") ~ "Former Soviet Union",
       TRUE ~ NA_character_
     )
   )
 
-
 ```
+
+
+```{r}
+ggplot(DF, aes(agree, ranked)) +
+  geom_point() +
+  facet_wrap(~region) +
+  geom_text(aes(label=ifelse(agree < .5 ,as.character(country),'')),hjust=0,vjust=0) +
+  geom_text(aes(label=ifelse(agree > .75 ,as.character(country),'')),hjust=0,vjust=0)
+  
+  
+```
+
 
 
