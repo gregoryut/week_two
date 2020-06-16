@@ -73,7 +73,8 @@ ggplot(DF, aes(agree, ranked)) +
   geom_point() +
   facet_wrap(~region) +
   geom_text(aes(label=ifelse(agree < .5 ,as.character(country),'')),hjust=0,vjust=0) +
-  geom_text(aes(label=ifelse(agree > .75 ,as.character(country),'')),hjust=0,vjust=0)
+  geom_text(aes(label=ifelse(agree > .75 ,as.character(country),'')),hjust=0,vjust=0) +
+  theme_minimal()
   
   
 ```
