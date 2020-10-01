@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(readxl)
 library(tidyverse)
+library(ggrepel)
 
 glb_mntr <- read_excel("C:\\Users\\grish\\Desktop\\hybrid_stats_course\\data\\wgm2018_dataset_crosstabs_all_countries.xlsx", sheet = 1) %>%
   janitor::clean_names()
@@ -69,12 +70,16 @@ DF <- glb_mntr %>%
 
 
 ```{r}
-ggplot(DF, aes(agree, ranked)) +
-  geom_point() +
-  facet_wrap(~region) +
-  geom_text(aes(label=ifelse(agree < .5 ,as.character(country),'')),hjust=0,vjust=0) +
-  geom_text(aes(label=ifelse(agree > .75 ,as.character(country),'')),hjust=0,vjust=0) +
-  theme_minimal()
+ggplot(DF, aes(agree, ranked, label = country)) +
+  geom_point(color = "blue") +
+  facet_wrap(~ region) +
+  geom_text(aes(label=ifelse(agree < .5 & agree > .75, as.character(country),'')), hjust=0, vjust=0) +
+  geom_text_repel(aes(agree, ranked, label = country), size = 3) +
+  theme_classic() + 
+  theme(panel.background = element_blank(),strip.background = element_rect(colour="gray", fill="gray"), panel.border = element_rect(fill = NA, color = "black"),legend.title = element_blank(),legend.position="bottom", strip.text = element_text(face="bold", size=9), axis.text=element_text(face="bold"),axis.title = element_text(face="bold"),plot.title = element_text(face = "bold", hjust = 0.5,size=13)) +
+  ggtitle("% Of People Who Believe That Vacccines Are Safe
+                    by Country and Global Region") +
+  ylab("Percent Rank")
   
   
 ```
