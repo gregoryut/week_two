@@ -1,0 +1,97 @@
+---
+title: "lab3Challenge"
+author: "Gregory Utkin"
+date: "7/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(httr)
+library(jsonlite)
+# cities to be retrieved
+Cities <- data.frame(Name = c("Moscow", "Buenos-Aires", "Los-Angeles", "New-York", "Chicago", "Tokyo"))
+
+# get data of cities
+msc = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[1]), "/scores/", sep =  ""))$content))$categories)
+
+Buenos_aires = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[2]), "/scores/", sep =  ""))$content))$categories)
+
+LA = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[3]), "/scores/", sep =  ""))$content))$categories)
+
+NY = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[4]), "/scores/", sep =  ""))$content))$categories)
+
+Chc = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[5]), "/scores/", sep =  ""))$content))$categories)
+
+tky = data.frame(
+  fromJSON(rawToChar(GET(paste("https://api.teleport.org/api/urban_areas/slug:",
+                               tolower(Cities$Name[6]), "/scores/", sep = ""))$content))$categories)
+
+msc = msc %>%
+  select(name, score_out_of_10) %>%
+  mutate(city = "Moscow")
+
+BA = Buenos_aires %>%
+  select(name,score_out_of_10) %>%
+  mutate(city = "Buenos Aires")
+
+LA = LA %>%
+  select(name, score_out_of_10) %>%
+  mutate(city = "Los Angeles")
+
+NY = NY %>%
+  select(name, score_out_of_10) %>%
+  mutate(city = "NYC")
+
+Chic = Chc %>%
+  select(name, score_out_of_10) %>%
+  mutate(city = "Chicago")
+
+tky = tky %>%
+  select(name, score_out_of_10) %>%
+  mutate(city = "Tokyo")
+  
+  
+  
+df <- bind_rows(msc, BA, LA, NY, Chic, tky) %>%
+  filter(name %in% c("Cost of Living", "Safety", "Education", "Environmental Quality", "Tolerance", "Internet Access")) %>%
+  rename(`Score on a 10 point scale` = score_out_of_10)
+
+
+
+# plot
+ggplot(df, aes(city, `Score on a 10 point scale`, fill = city)) +
+  geom_col() +
+  facet_wrap(~name) +
+  theme_minimal() +
+  ggtitle("Score of life aspects from differnt cities") +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_blank(),
+    axis.title.x.bottom = element_blank()
+  ) +
+  scale_fill_viridis_d(option = "D")
+```
+
+
+
+
+
+
+
+
+
